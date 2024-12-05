@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 import myUserRoute from "./routes/MyUserRoute";
 import { v2 as cloudinary } from "cloudinary";
 import myRestaurantRoute from "./routes/MyRestaurantRoute";
@@ -9,7 +9,7 @@ import restaurantRoute from "./routes/RestaurantRoute";
 import orderRoute from "./routes/OrderRoute";
 
 mongoose
-  .connect(process.env.MONGODB_CONNECTION_STRING as string)
+  .connect(process.env.MONGODB_CONNECTION_STRING)
   .then(() => console.log("Connected to database!"));
 
 cloudinary.config({
