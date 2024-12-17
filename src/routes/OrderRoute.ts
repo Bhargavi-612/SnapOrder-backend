@@ -13,6 +13,7 @@ router.post(
   OrderController.createCheckoutSession
 );
 
-router.post("/checkout/webhook", OrderController.stripeWebhookHandler);
+router.post("/checkout/webhook", OrderController.razorpayWebhookHandler);
+router.post("/checkout/makePayment", OrderController.makePayment);
 
 export default router;
