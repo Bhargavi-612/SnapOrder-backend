@@ -7,6 +7,7 @@ import { v2 as cloudinary } from "cloudinary";
 import myRestaurantRoute from "./routes/MyRestaurantRoute";
 import restaurantRoute from "./routes/RestaurantRoute";
 import orderRoute from "./routes/OrderRoute";
+import bodyParser = require("body-parser");
 
 mongoose
   .connect(process.env.MONGODB_CONNECTION_STRING)
@@ -21,6 +22,7 @@ cloudinary.config({
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.json());
 
 app.use("/api/order/checkout/webhook", express.raw({ type: "*/*" }));
 
