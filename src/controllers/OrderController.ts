@@ -246,7 +246,7 @@ const createCheckoutSession = async (req: Request, res: Response) => {
     newOrder.totalAmount = totalAmount;
     await newOrder.save();
 
-    res.json({totalCost: totalAmount});
+    res.json({totalCost: totalAmount, orderId: newOrder._id});
   } catch (error: any) {
     console.log(error);
     res.status(500).json({ message: error.message });
@@ -256,7 +256,16 @@ const createCheckoutSession = async (req: Request, res: Response) => {
 const razorpayWebhookHandler = async (req: Request, res: Response) => {
   // const signature = req.headers["x-razorpay-signature"];
   // const body = JSON.stringify(req.body);
-
+  try{
+    const {payload}= req.body;
+    const razorpay_order_id=payload.payment.entity.order_id;
+    const order = await Order.findOne({ razorpayOrderId:razorpay_order_id });
+    if(!order) {
+      return res.status(400).json({ message: "Order not found" });
+    }
+    order.status = "paid";
+    await order.save();
+  }
   // try {
   //   // Verify signature
   //   const isValid = Razorpay.validateWebhookSignature(
@@ -283,10 +292,11 @@ const razorpayWebhookHandler = async (req: Request, res: Response) => {
   //   }
 
   //   res.status(200).send();
-  // } catch (error: any) {
-  //   console.log(error);
-  //   res.status(500).send(`Webhook error: ${error.message}`);
-  // }
+  // } 
+  catch (error: any) {
+    console.log(error);
+    res.status(500).send(`Webhook error: ${error.message}`);
+  }
 };
 
 const calculateTotalAmount = (
@@ -312,7 +322,7 @@ const calculateTotalAmount = (
 
 // Route to create a Razorpay order
 const makePayment = async (req: Request, res: Response) => {
-  const { amount } = req.body;
+  const { amount, orderId } = req.body;
 
   const options = {
     amount: amount*100,
@@ -328,7 +338,13 @@ const makePayment = async (req: Request, res: Response) => {
 
     // user.balance += amount;
     // await user.save();
-
+    const order1 = await Order.findOne({ _id:orderId });
+    if (!order1) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order1.razorpayOrderId = order.id;
+    // order1.status = "paid";
+    await order1.save();
     res.status(200).json({
       id: order.id,
       currency: order.currency,
