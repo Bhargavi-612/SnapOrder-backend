@@ -258,7 +258,7 @@ const razorpayWebhookHandler = async (req: Request, res: Response) => {
   // const body = JSON.stringify(req.body);
   try{
     const payload = req.body;
-    console.log(payload);
+    console.log(JSON.stringify(payload));
     const razorpay_order_id=payload.payment.entity.order_id;
     const order = await Order.findOne({ razorpayOrderId:razorpay_order_id });
     if(!order) {
